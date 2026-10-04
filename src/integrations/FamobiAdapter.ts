@@ -16,4 +16,14 @@ export function connectFamobi(controller: GameController): void {
       console.error("Famobi gameEnd failed:", error);
     });
   });
+  controller.events.on("scoreChanged", ({ level, score }) => {
+  window.GameInterface.sendScore(score, {
+    type: "live",
+    level,
+  });
+});
+
+controller.events.on("progressChanged", ({ progress }) => {
+  window.GameInterface.sendProgress(progress * 100);
+});
 }
