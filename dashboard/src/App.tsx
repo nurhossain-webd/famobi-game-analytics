@@ -1,23 +1,30 @@
 import { useEffect, useState } from "react";
 
-type GameplayEvent = {
-  id: string;
-  type: "game_start" | "game_end";
-  level: number;
-  timestamp: number;
-  outcome?: "complete" | "fail" | "left";
-  score?: number;
-  progress?: number;
-};
+import Overview from "./components/Overview";
+import OutcomeChart from "./components/OutcomeChart";
+import ScoreByLevelChart from "./components/ScoreByLevelChart";
+
+import type { GameplayEvent } from "./types/GameplayEvent";
+
+import {
+  getEndedRuns,
+  getOverviewData,
+  getOutcomeData,
+  getScoreByLevelData,
+} from "./utils/analyticscalculations";
 
 function App() {
+  // State
   const [events, setEvents] = useState<GameplayEvent[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Fetch Analytics
   useEffect(() => {
     async function loadAnalytics() {
       try {
-        const response = await fetch("http://localhost:3001/api/analytics");
+        const response = await fetch(
+          "http://localhost:3001/api/analytics"
+        );
 
         if (!response.ok) {
           throw new Error("Failed to load analytics");
@@ -35,51 +42,40 @@ function App() {
     void loadAnalytics();
   }, []);
 
-  const endedRuns = events.filter((event) => event.type === "game_end");
+  // Prepare Dashboard Data
+  const endedRuns = getEndedRuns(events);
 
-const totalRuns = endedRuns.length;
+  const {
+    totalRuns,
+    averageScore,
+    completionRate,
+  } = getOverviewData(endedRuns);
 
-const averageScore =
-  totalRuns > 0
-    ? Math.round(
-        endedRuns.reduce((sum, event) => sum + (event.score ?? 0), 0) /
-          totalRuns
-      )
-    : 0;
+  const outcomeData = getOutcomeData(endedRuns);
 
-const completedRuns = endedRuns.filter(
-  (event) => event.outcome === "complete"
-).length;
+  const scoreByLevelData = getScoreByLevelData(endedRuns);
 
-const completionRate =
-  totalRuns > 0 ? Math.round((completedRuns / totalRuns) * 100) : 0;
-
+  // Loading State
   if (loading) {
     return <p>Loading analytics...</p>;
   }
 
- return (
-  <main>
-    <h1>Gameplay Analytics</h1>
+  // Dashboard UI
+  return (
+    <main>
+      <h1>Gameplay Analytics</h1>
 
-    <section>
-      <div>
-        <h2>Total Runs</h2>
-        <p>{totalRuns}</p>
-      </div>
+      <Overview
+        totalRuns={totalRuns}
+        averageScore={averageScore}
+        completionRate={completionRate}
+      />
 
-      <div>
-        <h2>Average Score</h2>
-        <p>{averageScore}</p>
-      </div>
+      <OutcomeChart data={outcomeData} />
 
-      <div>
-        <h2>Completion Rate</h2>
-        <p>{completionRate}%</p>
-      </div>
-    </section>
-  </main>
-);
+      <ScoreByLevelChart data={scoreByLevelData} />
+    </main>
+  );
 }
 
 export default App;
