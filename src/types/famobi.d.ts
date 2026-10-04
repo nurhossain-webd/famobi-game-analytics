@@ -1,7 +1,11 @@
 interface FamobiGameInterface {
   gameReady: (isPlayerReady?: boolean) => void;
+
   gameStart: (level?: number) => Promise<void>;
   gameEnd: (reason: "complete" | "fail" | "quit") => Promise<void>;
+
+  gamePause: () => Promise<void>;
+  gameResume: () => Promise<void>;
 
   sendScore: (
     score: number,
