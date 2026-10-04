@@ -64,6 +64,27 @@ app.post("/api/events", async (req, res) => {
     });
   }
 });
+app.get("/api/analytics", async (_req, res) => {
+  try {
+    const snapshot = await db
+      .collection("gameplayEvents")
+      .orderBy("timestamp", "asc")
+      .get();
+
+    const events = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    return res.json(events);
+  } catch (error) {
+    console.error("Failed to load analytics:", error);
+
+    return res.status(500).json({
+      error: "Failed to load analytics",
+    });
+  }
+});
 
 app.listen(PORT, () => {
   console.log(`Backend running on http://localhost:${PORT}`);
