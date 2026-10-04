@@ -21,7 +21,11 @@ async function sendEvent(event: object): Promise<void> {
 }
 
 export function connectAnalytics(controller: GameController): void {
+  let runStartScore = 0;
+
   controller.events.on("runStarted", ({ level, occurredAt }) => {
+    runStartScore = controller.getSnapshot().score;
+
     void sendEvent({
       type: "game_start",
       level,
@@ -32,11 +36,13 @@ export function connectAnalytics(controller: GameController): void {
   controller.events.on(
     "runEnded",
     ({ level, score, progress, reason, occurredAt }) => {
+      const levelScore = score - runStartScore;
+
       void sendEvent({
         type: "game_end",
         level,
         outcome: reason === "quit" ? "left" : reason,
-        score,
+        score: levelScore,
         progress: Math.round(progress * 100),
         timestamp: occurredAt,
       });
