@@ -1,3 +1,4 @@
+import "./App.css";
 import { useEffect, useState } from "react";
 
 import Overview from "./components/Overview";
@@ -62,20 +63,21 @@ function App() {
 
   // Dashboard UI
   return (
-    <main>
-      <h1>Gameplay Analytics</h1>
+  <main>
+    <h1>Gameplay Analytics</h1>
 
-      <Overview
-        totalRuns={totalRuns}
-        averageScore={averageScore}
-        completionRate={completionRate}
-      />
+    <Overview
+      totalRuns={totalRuns}
+      averageScore={averageScore}
+      completionRate={completionRate}
+    />
 
+    <div className="charts">
       <OutcomeChart data={outcomeData} />
-
       <ScoreByLevelChart data={scoreByLevelData} />
-    </main>
-  );
+    </div>
+  </main>
+);
 }
 
 export default App;
