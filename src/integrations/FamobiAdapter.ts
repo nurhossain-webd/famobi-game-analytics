@@ -2,9 +2,10 @@ import type { GameController } from "../application/GameController";
 
 export function connectFamobi(controller: GameController): void {
   // Tell Famobi when the game is ready.
-  controller.events.on("ready", () => {
-    window.GameInterface.gameReady();
-  });
+ controller.events.on("ready", () => {
+  window.GameInterface.sendPreloadProgress(100);
+  window.GameInterface.gameReady();
+});
 
   // Tell Famobi when gameplay starts.
   controller.events.on("runStarted", ({ level }) => {

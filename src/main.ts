@@ -36,8 +36,6 @@ const controller = new GameController(simulation, new LocalGameStorage());
 
 connectFamobi(controller);
 connectAnalytics(controller);
-
-connectFamobi(controller);
 const snakeScene = new SnakeScene(controller);
 let currentSnapshot = controller.getSnapshot();
 

@@ -1,4 +1,5 @@
 interface FamobiGameInterface {
+  sendPreloadProgress: (progress: number) => void;
   gameReady: (isPlayerReady?: boolean) => void;
 
   gameStart: (level?: number) => Promise<void>;
