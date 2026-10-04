@@ -8,6 +8,7 @@ import { SnakeScene } from './game/scenes/SnakeScene';
 import { SnakeGame } from './game/snakeGame';
 import type { Direction, GamePhase, GameSnapshot } from './game/types';
 import { connectFamobi } from "./integrations/FamobiAdapter";
+import { connectAnalytics } from "./integrations/AnalyticsClient";
 
 const requiredElement = <T extends HTMLElement>(selector: string): T => {
   const element = document.querySelector<T>(selector);
@@ -32,6 +33,9 @@ const levelSelect = requiredElement<HTMLElement>('#level-select');
 
 const simulation = new SnakeGame();
 const controller = new GameController(simulation, new LocalGameStorage());
+
+connectFamobi(controller);
+connectAnalytics(controller);
 
 connectFamobi(controller);
 const snakeScene = new SnakeScene(controller);

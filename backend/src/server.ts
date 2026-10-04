@@ -8,21 +8,42 @@ const PORT = 3001;
 app.use(cors());
 app.use(express.json());
 
-// Check whether the backend is running
 app.get("/health", (_req, res) => {
   res.json({
     status: "ok",
   });
 });
 
-// Receive a gameplay analytics event and store it in Firestore
 app.post("/api/events", async (req, res) => {
   const event = req.body;
 
-  // Basic validation
-  if (!event.type || !event.level || !event.timestamp) {
+  // Validate fields shared by both event types
+  if (
+    !event ||
+    !["game_start", "game_end"].includes(event.type) ||
+    !Number.isInteger(event.level) ||
+    event.level < 1 ||
+    typeof event.timestamp !== "number"
+  ) {
     return res.status(400).json({
-      error: "Missing required event fields",
+      error: "Invalid gameplay event",
+    });
+  }
+
+  // game_end has additional required fields
+  if (
+    event.type === "game_end" &&
+    (
+      !["complete", "fail", "left"].includes(event.outcome) ||
+      typeof event.score !== "number" ||
+      event.score < 0 ||
+      typeof event.progress !== "number" ||
+      event.progress < 0 ||
+      event.progress > 100
+    )
+  ) {
+    return res.status(400).json({
+      error: "Invalid game_end event",
     });
   }
 
